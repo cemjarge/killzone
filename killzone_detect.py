@@ -149,7 +149,7 @@ class Trader:
                         'London Close Low': self.londonc_low, 'New York Midnight Open Price': self.newyork_open, '8:30 Open': self.eight_thrity}
                 df2 = pd.DataFrame(data, index=[self.date])
                 df2 = df2.astype(float)
-                df2.to_csv('./killzone.cvs', mode='a', header=False)
+                df2.to_csv('./killzone.csv', mode='a', header=False)
                 self.__init__()
             # Else just compare the prices normal
             else:

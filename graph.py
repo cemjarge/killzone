@@ -2,11 +2,12 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 class DraggablePoints:
-    def __init__(self, scatter, line, rect1, rect2):
+    def __init__(self, scatter, line, rect1, rect2, rect3):
         self.scatter = scatter
         self.line = line
         self.rect1 = rect1
         self.rect2 = rect2
+        self.rect3 = rect3
         self.dragging_point = None
         self.fig = scatter.figure
         self.ax = scatter.axes
@@ -41,7 +42,7 @@ class DraggablePoints:
         # Update the bounding boxes around the points
         self.update_rectangle(self.rect1, 0, 4)  # Update first rectangle (around points 1-4)
         self.update_rectangle(self.rect2, 4, 8)  # Update second rectangle (around points 2-5)
-        self.update_rectangle(self.rect2, 8, 12)  # Update second rectangle (around points 2-5)
+        self.update_rectangle(self.rect3, 8, 12)  # Update second rectangle (around points 2-5)
 
         self.fig.canvas.draw_idle()
 
@@ -89,6 +90,6 @@ rect3 = patches.Rectangle((min(x[8:12]), min(y[8:12])),
                           linewidth=1, edgecolor='b', facecolor='none')
 ax.add_patch(rect3)
 
-draggable = DraggablePoints(scatter, line, rect1, rect2)
+draggable = DraggablePoints(scatter, line, rect1, rect2, rect3)
 
 plt.show()

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draggable Points with Resizable Frames</title>
+    <style>
+        svg {
+            border: 1px solid black;
+        }
+        circle {
+            cursor: pointer;
+        }
+        circle.fixed {
+            cursor: default;
+        }
+    </style>
+</head>
+<body>
+    <svg width="600" height="400">
+        <!-- Frames and Points will be added here by JavaScript -->
+    </svg>
+    <script>
+        const svg = document.querySelector('svg');
+        const points = [
+            { x: 50, y: 200, draggable: false },
+            { x: 100, y: 200, draggable: false },
+            { x: 75, y: 300, draggable: true },
+            { x: 75, y: 100, draggable: true },
+            { x: 200, y: 200, draggable: false },
+            { x: 250, y: 200, draggable: false },
+            { x: 225, y: 300, draggable: true },
+            { x: 225, y: 100, draggable: true },
+            { x: 350, y: 200, draggable: false },
+            { x: 400, y: 200, draggable: false },
+            { x: 375, y: 300, draggable: true },
+            { x: 375, y: 100, draggable: true },
+            { x: 500, y: 200, draggable: false },
+            { x: 550, y: 200, draggable: false },
+            { x: 525, y: 300, draggable: true },
+            { x: 525, y: 100, draggable: true }
+        ];
+
+        // Frame groups, each containing indices of the 4 points it surrounds
+        const frames = [
+            { pointsIndices: [0, 1, 2, 3] },
+            { pointsIndices: [4, 5, 6, 7] },
+            { pointsIndices: [8, 9, 10, 11] },
+            { pointsIndices: [12, 13, 14, 15] }
+        ];
+
+        // Initialize frames
+        frames.forEach(frame => {
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            frame.element = rect;
+            rect.setAttribute('fill', 'none');
+            rect.setAttribute('stroke', 'black');
+            svg.appendChild(rect);
+            updateFrame(frame);
+        });
+
+        // Initialize points
+        points.forEach((point, i) => {
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', point.x);
+            circle.setAttribute('cy', point.y);
+            circle.setAttribute('r', 5);
+            circle.setAttribute('fill', point.draggable ? 'red' : 'blue');
+            circle.setAttribute('data-index', i);
+
+            if (!point.draggable) {
+                circle.classList.add('fixed'); // Add a class to fixed points
+            }
+
+            svg.appendChild(circle);
+
+            if (point.draggable) {
+                circle.addEventListener('mousedown', startDrag);
+            }
+        });
+
+        function updateFrame(frame) {
+            const pointsGroup = frame.pointsIndices.map(index => points[index]);
+            const minX = Math.min(...pointsGroup.map(p => p.x)) - 10;
+            const minY = Math.min(...pointsGroup.map(p => p.y)) - 10;
+            const maxX = Math.max(...pointsGroup.map(p => p.x)) + 10;
+            const maxY = Math.max(...pointsGroup.map(p => p.y)) + 10;
+            
+            frame.element.setAttribute('x', minX);
+            frame.element.setAttribute('y', minY);
+            frame.element.setAttribute('width', maxX - minX);
+            frame.element.setAttribute('height', maxY - minY);
+        }
+
+        function startDrag(event) {
+            const index = event.target.getAttribute('data-index');
+            const circle = event.target;
+            const offsetX = event.clientX - circle.getAttribute('cx');
+            const offsetY = event.clientY - circle.getAttribute('cy');
+            
+            function dragMove(e) {
+                const newX = e.clientX - offsetX;
+                const newY = e.clientY - offsetY;
+                //circle.setAttribute('cx', Math.max(5, Math.min(595, newX)));
+                circle.setAttribute('cy', Math.max(5, Math.min(395, newY)));
+                points[index].x = parseFloat(circle.getAttribute('cx'));
+                points[index].y = parseFloat(circle.getAttribute('cy'));
+
+                // Update the frame containing this point
+                frames.forEach(frame => {
+                    if (frame.pointsIndices.includes(parseInt(index))) {
+                        updateFrame(frame);
+                    }
+                });
+            }
+
+            function endDrag() {
+                document.removeEventListener('mousemove', dragMove);
+                document.removeEventListener('mouseup', endDrag);
+            }
+
+            document.addEventListener('mousemove', dragMove);
+            document.addEventListener('mouseup', endDrag);
+        }
+
+    </script>
+</body>
+</html>
